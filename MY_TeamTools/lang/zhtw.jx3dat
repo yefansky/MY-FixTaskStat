@@ -121,6 +121,7 @@ return {
 	['Asking...'] = '正在徵詢對方意見\n如果長時間未響應可能是對方沒有安裝插件。',
 	['Syncing: %.2f%%.'] = '正在同步數據(%.2f%%)...',
 	['Refuse request'] = '對方拒絕了您的請求！',
+	['Only max level can use this feature.'] = '只有滿級角色才能使用該功能。',
 	['Party limit'] = '必須和對方組隊',
 
 	-- MY_RoomRequest
