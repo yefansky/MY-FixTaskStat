@@ -145,6 +145,13 @@ function D.OpenPanel()
 						})
 					end,
 				},
+				{
+					szOption = _L['Manage my online world mark'],
+					fnAction = function()
+						X.OpenBrowser('https://j3cx.com/world-mark/mine')
+						X.UI.ClosePopupMenu()
+					end,
+				},
 			}
 			X.UI.PopupMenu(menu)
 		end,

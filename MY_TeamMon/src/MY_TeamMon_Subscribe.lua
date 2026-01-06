@@ -38,6 +38,17 @@ function D.OpenPanel(szModule)
 		name = 'Btn_Option',
 		x = 960, y = 54, w = 20, h = 20,
 		buttonStyle = 'OPTION',
+		menu = function()
+			return {
+				{
+					szOption = _L['Manage my online data'],
+					fnAction = function()
+						X.OpenBrowser('https://j3cx.com/team-monitor/mine')
+						X.UI.ClosePopupMenu()
+					end,
+				},
+			}
+		end,
 	})
 	local frame = ui:Raw()
 	frame:BringToTop()

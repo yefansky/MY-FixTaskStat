@@ -3,6 +3,7 @@ return {
 	['Leave map %s.'] = '你已离开地图【%s】。',
 	['Enter map %s.'] = '你已进入地图【%s】。',
 	['Encrypt and compressing: '] = '更新加密压缩：',
+	['Manage my online data'] = '管理我的在线数据',
 	-- MY_TeamMon_CenterAlarm.lua --
 	['MY_TeamMon_CenterAlarm'] = '中央提醒',
 	-- MY_TeamMon_CircleLine.lua --
