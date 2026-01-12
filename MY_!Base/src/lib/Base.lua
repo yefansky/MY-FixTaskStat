@@ -343,6 +343,20 @@ X.PACKET_INFO.AUTHOR_ROLE_LIST    = {
 	{ szGlobalID = '2882303761517969694', dwID = 25747825, szName = szNameCN1, szHeader = szHeader1 }, -- NameCN1
 	{ szGlobalID = '3855081281029320236', dwID = 26037104, szName = szNameCN1, szHeader = szHeader1 },
 	{ szGlobalID = '3963167672086075586', dwID = 27419106, szName = szNameCN1, szHeader = szHeader1 },
+	-- 国际服
+	{ szGlobalID = '18014398509867167', dwID =    385183, szName = szNameTW2, szHeader = szHeader1 }, -- NameTW2
+	{ szGlobalID = '18014398515510594', dwID =   6028610, szName = szNameTW2, szHeader = szHeader1 },
+	{ szGlobalID = '18014398518050253', dwID =   8568269, szName = szNameTW1, szHeader = szHeader1 }, -- NameTW1
+	-- 缘起稻香
+	{ szGlobalID = '36028797018964996', dwID =      1028, szName = szNameCN1, szHeader = szHeader1 }, -- NameCN1
+	{ szGlobalID = '54043195528446612', dwID =   1234873, szName = szNameCN1, szHeader = szHeader1 },
+	{ szGlobalID = '90071992547410200', dwID =   1438152, szName = szNameCN2, szHeader = szHeader1 }, -- NameCN2
+	{ szGlobalID = '72057594037928079', dwID =   1542205, szName = szNameCN1, szHeader = szHeader1 },
+	{ szGlobalID = '36028797020576831', dwID =   1677727, szName = szNameCN2, szHeader = szHeader1 },
+	-- 天宝盛世
+	{ szGlobalID = '18014398509483243', dwID =      1259, szName = szNameCN1, szHeader = szHeader1 },
+	{ szGlobalID = '18014398511806138', dwID =   2324154, szName = szNameCN1, szHeader = szHeader1 }, -- NameCN1
+	{ szGlobalID = '18014398511806143', dwID =   2324159, szName = szNameCN2, szHeader = szHeader1 }, -- NameCN2
 	-- 通配
 	{ szName = szNameCN1, dwID = '*', szHeader = szHeader2 }, -- 简体
 	{ szName = szNameCN2, dwID = '*', szHeader = szHeader2 }, -- 简体
