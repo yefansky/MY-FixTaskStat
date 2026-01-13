@@ -65,7 +65,7 @@ X.RegisterBgMsg('MY_ENTER_MAP', function(_, aData, nChannel, dwTalkerID, szTalke
 				tInfoCache[dwTalkerID] = {
 					szName = info.szName,
 					dwForceID = info.dwForceID,
-					dwMountKungfuID = info.dwActualMountKungfuID,
+					dwMountKungfuID = info.dwActualKungfuID,
 				}
 			end
 		end

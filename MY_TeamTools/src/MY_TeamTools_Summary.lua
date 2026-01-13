@@ -229,10 +229,10 @@ function D.UpdateList(page)
 
 	for k, v in ipairs(aTeam) do
 		-- 心法统计
-		tKungfu[v.dwMountKungfuID] = tKungfu[v.dwMountKungfuID] or {}
-		table.insert(tKungfu[v.dwMountKungfuID], v)
+		tKungfu[v.dwKungfuID] = tKungfu[v.dwKungfuID] or {}
+		table.insert(tKungfu[v.dwKungfuID], v)
 		D.CountScore(v, tScore)
-		if not RT_SELECT_KUNGFU or (RT_SELECT_KUNGFU and v.dwMountKungfuID == RT_SELECT_KUNGFU) then
+		if not RT_SELECT_KUNGFU or (RT_SELECT_KUNGFU and v.dwKungfuID == RT_SELECT_KUNGFU) then
 			local szName = 'P' .. (v.szGlobalID or v.dwID)
 			local h = page.hPlayerList:Lookup(szName)
 			if not h then
@@ -246,8 +246,8 @@ function D.UpdateList(page)
 			h.szGlobalID = v.szGlobalID
 			h.szName     = v.szName
 			-- 心法名字
-			if v.dwMountKungfuID and v.dwMountKungfuID ~= 0 then
-				local nIcon = select(2, MY_GetSkillName(v.dwMountKungfuID, 1))
+			if v.dwKungfuID and v.dwKungfuID ~= 0 then
+				local nIcon = select(2, MY_GetSkillName(v.dwKungfuID, 1))
 				h:Lookup('Image_Icon'):FromIconID(nIcon)
 			else
 				h:Lookup('Image_Icon'):FromUITex(GetForceImage(v.dwForceID))
@@ -831,7 +831,7 @@ function D.GetTeamData(page)
 			szGlobalID        = tMember.szGlobalID,
 			dwServerID        = tMember.dwServerID,
 			dwForceID         = tMember.dwForceID, -- 门派ID
-			dwMountKungfuID   = tMember.dwKungfuID, -- 内功
+			dwKungfuID        = tMember.dwKungfuID, -- 内功
 			-- tPermanentEnchant = {}, -- 附魔
 			-- tTemporaryEnchant = {}, -- 临时附魔
 			-- tEquip            = {}, -- 特效装备

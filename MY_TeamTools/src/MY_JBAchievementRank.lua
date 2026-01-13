@@ -238,7 +238,7 @@ X.RegisterEvent({
 					local info = X.GetTeamMemberInfo(dwTarID)
 					local guid = X.GetPlayerGlobalID(dwTarID) or 0
 					if info then
-						table.insert(aTeammate, info.szName .. ',' .. info.dwActualMountKungfuID .. ',' .. guid .. ',' .. dwTarID)
+						table.insert(aTeammate, info.szName .. ',' .. info.dwActualKungfuID .. ',' .. guid .. ',' .. dwTarID)
 					end
 				end
 			else

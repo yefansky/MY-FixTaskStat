@@ -50,7 +50,7 @@ function D.CreateSnapshot()
 		for _, dwTarID in ipairs(team.GetTeamMemberList()) do
 			local info = X.GetTeamMemberInfo(dwTarID)
 			local guid = X.GetPlayerGlobalID(dwTarID) or 0
-			table.insert(aTeammate, info.szName .. ',' .. dwTarID .. ',' .. guid .. ',' .. info.dwActualMountKungfuID)
+			table.insert(aTeammate, info.szName .. ',' .. dwTarID .. ',' .. guid .. ',' .. info.dwActualKungfuID)
 		end
 	end
 	local me = X.GetClientPlayer()

@@ -416,8 +416,8 @@ function D.OnTargetUpdate(dwID, bForce)
 			dwMountKungfuID = UI_GetPlayerMountKungfuID()
 		else
 			local info = X.GetTeamMemberInfo(dwID)
-			if info and not X.IsEmpty(info.dwActualMountKungfuID) then
-				dwMountKungfuID = info.dwActualMountKungfuID
+			if info and not X.IsEmpty(info.dwActualKungfuID) then
+				dwMountKungfuID = info.dwActualKungfuID
 			else
 				local kungfu = player.GetKungfuMount()
 				if kungfu then

@@ -285,7 +285,7 @@ function D.OnTableInsert(dwID, dwBuffID, nLevel, nIcon)
 	if dwTargetID == dwID then
 		h:Lookup('Image_Select'):Show()
 	end
-	h:Lookup('Image_KungFu'):FromIconID(Table_GetSkillIconID(info.dwActualMountKungfuID) or 1435)
+	h:Lookup('Image_KungFu'):FromIconID(Table_GetSkillIconID(info.dwActualKungfuID) or 1435)
 	h:Lookup('Text_Name'):SetText(nCount .. ' ' .. info.szName)
 	h:Lookup('Image_life'):SetPercentage(info.fCurrentLife64 / math.max(info.fMaxLife64, 1))
 	local box = h:Lookup('Box_Icon')

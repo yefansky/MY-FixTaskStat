@@ -508,7 +508,7 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 			if O.bForceIcon then
 				local info = X.IsTeammate(v.id) and MY_IsPlayer(v.id) and X.GetTeamMemberInfo(v.id)
 				if info then
-					item:Lookup('Image_Icon'):FromIconID(Table_GetSkillIconID(info.dwActualMountKungfuID, 1))
+					item:Lookup('Image_Icon'):FromIconID(Table_GetSkillIconID(info.dwActualKungfuID, 1))
 				elseif MY_IsPlayer(v.id) then
 					item:Lookup('Image_Icon'):FromUITex(GetForceImage(dwForceID))
 				else
