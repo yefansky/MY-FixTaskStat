@@ -342,6 +342,39 @@ function D.OnInitPage()
 						end
 					end,
 				},
+				{
+					szOption = _L['Add to local data'],
+					fnAction = function()
+						if not rec.szDataURL then
+							return
+						end
+						X.FetchLUAData(rec.szDataURL, { passphrase = false, crc = false, compress = false })
+							:Then(function(aData)
+								if not X.IsTable(aData) then
+									X.OutputAnnounceMessage(_L('Decode %s failed!', _L['World mark']))
+									return
+								end
+								-- 清洗数据，只保留 x, y, z, mark
+								local aCleanData = {}
+								for i, pt in ipairs(aData) do
+									aCleanData[i] = {
+										x = tonumber(pt.x) or 0,
+										y = tonumber(pt.y) or 0,
+										z = tonumber(pt.z) or 0,
+										mark = tonumber(pt.mark) or i,
+									}
+								end
+								MY_YunWorldMark_LocalData.Add({
+									szName = rec.szName,
+									szAuthor = rec.szAuthor,
+									aData = aCleanData,
+								}, D.dwMapID)
+							end)
+							:Catch(function(error)
+								X.OutputAnnounceMessage((error and error.message) or _L['Failed.'])
+							end)
+					end,
+				},
 			}
 			PopupMenu(t)
 		end,
