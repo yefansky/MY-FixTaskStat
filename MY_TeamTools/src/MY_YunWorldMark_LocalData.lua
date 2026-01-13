@@ -140,7 +140,7 @@ function D.OpenEditPanel(rec)
 	local me = X.GetClientPlayer()
 	local dwDefaultMapID = (rec and rec.dwMapID) or (me and me.GetMapID()) or 0
 
-	local tMapName, aMapName, tMapMenu = {}, {}, {}
+	local tMapName, aMapSource, tMapMenu = {}, {}, {}
 	for _, group in ipairs(X.GetTypeGroupMap()) do
 		local tSub = { szOption = group.szGroup }
 		for _, info in ipairs(group.aMapInfo) do
@@ -153,7 +153,7 @@ function D.OpenEditPanel(rec)
 				end,
 			})
 			tMapName[info.dwID] = info.szName
-			table.insert(aMapName, info.szName)
+			table.insert(aMapSource, { text = info.szName, dwID = info.dwID })
 		end
 		table.insert(tMapMenu, tSub)
 	end
@@ -183,7 +183,18 @@ function D.OpenEditPanel(rec)
 		h = 25,
 		text = tMapName[dwDefaultMapID] or '',
 		placeholder = _L['Current map'],
-		autocomplete = { { 'option', 'source', aMapName } },
+		autocomplete = {
+			{
+				'option', 'source', aMapSource,
+			},
+			{
+				'option', 'afterComplete', function(raw)
+					if raw and raw.dwID then
+						D.nEditMapID = raw.dwID
+					end
+				end,
+			},
+		},
 		menu = function() return tMapMenu end,
 	})
 	nY = nY + nLineH
@@ -312,7 +323,7 @@ function D.OnInitPage()
 		D.dwMapID = 0
 	end
 
-	local tMapName, aMapName, tMapMenu = {}, {}, {}
+	local tMapName, aMapSource, tMapMenu = {}, {}, {}
 	table.insert(tMapMenu, {
 		szOption = _L['All maps'],
 		fnAction = function()
@@ -335,7 +346,7 @@ function D.OnInitPage()
 				end,
 			})
 			tMapName[info.dwID] = info.szName
-			table.insert(aMapName, info.szName)
+			table.insert(aMapSource, { text = info.szName, dwID = info.dwID })
 		end
 		table.insert(tMapMenu, tSub)
 	end
@@ -352,7 +363,20 @@ function D.OnInitPage()
 		h = COMPONENT_H,
 		text = szCurrentMapName,
 		placeholder = _L['Current map'],
-		autocomplete = { { 'option', 'source', aMapName } },
+		autocomplete = {
+			{
+				'option', 'source', aMapSource,
+			},
+			{
+				'option', 'afterComplete', function(raw)
+					if raw and raw.dwID then
+						D.dwMapID = raw.dwID
+					else
+						D.dwMapID = 0
+					end
+				end,
+			},
+		},
 		menu = function() return tMapMenu end,
 		onSpecialKeyDown = function(_, szKey)
 			if szKey == 'Enter' then
