@@ -369,17 +369,22 @@ function PS.OnPanelActive(wnd)
 				return menu
 			end
 			local menu = CreateMenu({}, tRSS.s)
-			x = x + ui:Append('WndButton', {
+			local t = {
 				x = x, h = 30,
 				name = 'WndButton_RSS',
 				text = szText,
-				menu = #menu > 0 and menu or nil,
-				onClick = #menu == 0
-					and function()
-						X.OpenBrowser(FormatSQS(szPath), szMode)
-					end
-					or nil,
-			}):AutoWidth():Width() + 5
+			}
+			if tRSS.c then
+				t.r, t.g, t.b = X.HumanColor2RGB(tRSS.c)
+			end
+			if #menu == 0 then
+				t.onClick = function()
+					X.OpenBrowser(FormatSQS(szPath), szMode)
+				end
+			else
+				t.menu = menu
+			end
+			x = x + ui:Append('WndButton', t):AutoWidth():Width() + 5
 			PS.OnPanelResize(wnd)
 			D.fnDrawRSS = nil
 		end
