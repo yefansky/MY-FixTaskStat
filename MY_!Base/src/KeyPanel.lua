@@ -1,10 +1,10 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
--- @link     : https://jx3.derzh.com/
+-- @link     : https://jx3.zhaiyiming.com/
 -- @desc     : KeyPanel
 -- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
--- @modifier : Emil Zhai (root@derzh.com)
--- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+-- @modifier : Emil Zhai (root@zhaiyiming.com)
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 ---@class (partial) MY
 local X = MY

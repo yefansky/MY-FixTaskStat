@@ -1,10 +1,10 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
--- @link     : https://jx3.derzh.com/
+-- @link     : https://jx3.zhaiyiming.com/
 -- @desc     : 扁平血条 - 官方托管
 -- @author   : 茗伊 @双梦镇 @追风蹑影
--- @modifier : Emil Zhai (root@derzh.com)
--- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+-- @modifier : Emil Zhai (root@zhaiyiming.com)
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_LifeBar'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^27.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.1') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -147,7 +147,7 @@ function D.PrioritySorter(a, b)
 	return a.nPriority < b.nPriority
 end
 
-local KTarget, aCountDown, nR, nG, nB
+local KTarget, aCountDown, nR, nG, nB, bReset
 local tCountDownItem, szCountDownText, nCountDownSecond, fCountDownPercent
 function D.DrawLifeBar(dwID)
 	KTarget = (X.IsPlayer(dwID) and X.GetPlayer or X.GetNpc)(dwID)
@@ -155,7 +155,7 @@ function D.DrawLifeBar(dwID)
 		return
 	end
 	aCountDown = COUNTDOWN_CACHE[dwID]
-	nR, nG, nB = nil, nil, nil
+	nR, nG, nB, bReset = nil, nil, nil, false
 	while aCountDown and #aCountDown > 0 do
 		tCountDownItem, szCountDownText, nCountDownSecond, fCountDownPercent = aCountDown[1], nil, nil, nil
 		-- 根据不同类型倒计时计算倒计时时间、文字
@@ -214,7 +214,11 @@ function D.DrawLifeBar(dwID)
 			break
 		end
 		-- 如果没有找到可用倒计时，则移除该倒计时
+		bReset = true
 		table.remove(aCountDown, 1)
+	end
+	if bReset then
+		ResetCaption(dwID)
 	end
 	if szCountDownText then
 		SetCaptionOnTop(dwID, true)
@@ -225,7 +229,6 @@ function D.DrawLifeBar(dwID)
 		end
 	elseif #aCountDown == 0 then
 		COUNTDOWN_CACHE[dwID] = nil
-		ResetCaption(dwID)
 	end
 end
 
@@ -239,10 +242,15 @@ function D.ProcessCountdown(dwID, szType, szKey, tData)
 	if not COUNTDOWN_CACHE[dwID] then
 		COUNTDOWN_CACHE[dwID] = {}
 	end
+	local bReset = false
 	for i, p in X.ipairs_r(COUNTDOWN_CACHE[dwID]) do
 		if p.szType == szType and p.szKey == szKey then
+			bReset = true
 			table.remove(COUNTDOWN_CACHE[dwID], i)
 		end
+	end
+	if bReset then
+		ResetCaption(dwID)
 	end
 	if tData then
 		local tData = X.Clone(tData)
@@ -259,7 +267,6 @@ function D.ProcessCountdown(dwID, szType, szKey, tData)
 		table.sort(COUNTDOWN_CACHE[dwID], D.PrioritySorter)
 	elseif #COUNTDOWN_CACHE[dwID] == 0 then
 		COUNTDOWN_CACHE[dwID] = nil
-		ResetCaption(dwID)
 	end
 end
 

@@ -1,10 +1,10 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
--- @link     : https://jx3.derzh.com/
+-- @link     : https://jx3.zhaiyiming.com/
 -- @desc     : 团队工具 - 团队概况
 -- @author   : 茗伊 @双梦镇 @追风蹑影
--- @modifier : Emil Zhai (root@derzh.com)
--- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+-- @modifier : Emil Zhai (root@zhaiyiming.com)
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools_Summary'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^27.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.6') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -198,7 +198,7 @@ function D.CalculateSort(tInfo)
 			nCount = tInfo[RT_SORT_FIELD]
 		end
 	end
-	if nCount == 0 and not tInfo.bIsOnLine then
+	if nCount == 0 and not tInfo.bOnline then
 		nCount = -2
 	end
 	return nCount
@@ -229,10 +229,11 @@ function D.UpdateList(page)
 
 	for k, v in ipairs(aTeam) do
 		-- 心法统计
-		tKungfu[v.dwMountKungfuID] = tKungfu[v.dwMountKungfuID] or {}
-		table.insert(tKungfu[v.dwMountKungfuID], v)
+		local dwHDKungfuID = GetHDKungfuID(v.dwKungfuID)
+		tKungfu[dwHDKungfuID] = tKungfu[dwHDKungfuID] or {}
+		table.insert(tKungfu[dwHDKungfuID], v)
 		D.CountScore(v, tScore)
-		if not RT_SELECT_KUNGFU or (RT_SELECT_KUNGFU and v.dwMountKungfuID == RT_SELECT_KUNGFU) then
+		if not RT_SELECT_KUNGFU or (RT_SELECT_KUNGFU and dwHDKungfuID == RT_SELECT_KUNGFU) then
 			local szName = 'P' .. (v.szGlobalID or v.dwID)
 			local h = page.hPlayerList:Lookup(szName)
 			if not h then
@@ -246,8 +247,8 @@ function D.UpdateList(page)
 			h.szGlobalID = v.szGlobalID
 			h.szName     = v.szName
 			-- 心法名字
-			if v.dwMountKungfuID and v.dwMountKungfuID ~= 0 then
-				local nIcon = select(2, MY_GetSkillName(v.dwMountKungfuID, 1))
+			if v.dwKungfuID and v.dwKungfuID ~= 0 then
+				local nIcon = select(2, MY_GetSkillName(v.dwKungfuID, 1))
 				h:Lookup('Image_Icon'):FromIconID(nIcon)
 			else
 				h:Lookup('Image_Icon'):FromUITex(GetForceImage(v.dwForceID))
@@ -269,7 +270,7 @@ function D.UpdateList(page)
 			end
 			local hBuff = h:Lookup('Box_Buff')
 			local hBox = h:Lookup('Box_Grandpa')
-			if not v.bIsOnLine then
+			if not v.bOnline then
 				h.hHandle_Equip.Pool:Clear()
 				h:Lookup('Text_Toofar1'):Show()
 				h:Lookup('Text_Toofar1'):SetText(g_tStrings.STR_GUILD_OFFLINE)
@@ -279,7 +280,7 @@ function D.UpdateList(page)
 				h:Lookup('Text_Toofar1'):Show()
 				if MY_TeamTools.szStatRange == 'ROOM' then
 					h:Lookup('Text_Toofar1'):SetText('-')
-				elseif v.bIsOnLine then
+				elseif v.bOnline then
 					h:Lookup('Text_Toofar1'):SetText(_L['Too far'])
 				end
 				hBuff:Hide()
@@ -476,7 +477,7 @@ function D.UpdateList(page)
 			else
 				if MY_TeamTools.szStatRange == 'ROOM' then
 					hScore:SetText('-')
-				elseif v.bIsOnLine then
+				elseif v.bOnline then
 					hScore:SetText(_L['Loading'])
 				else
 					hScore:SetText(g_tStrings.STR_GUILD_OFFLINE)
@@ -831,7 +832,7 @@ function D.GetTeamData(page)
 			szGlobalID        = tMember.szGlobalID,
 			dwServerID        = tMember.dwServerID,
 			dwForceID         = tMember.dwForceID, -- 门派ID
-			dwMountKungfuID   = tMember.dwKungfuID, -- 内功
+			dwKungfuID        = tMember.dwKungfuID, -- 内功
 			-- tPermanentEnchant = {}, -- 附魔
 			-- tTemporaryEnchant = {}, -- 临时附魔
 			-- tEquip            = {}, -- 特效装备
@@ -841,11 +842,11 @@ function D.GetTeamData(page)
 			nCopyID           = nil, -- 秘境ID
 			tBossKill         = {}, -- 秘境进度
 			nFightState       = KPlayer and KPlayer.bFightState and 1 or 0, -- 战斗状态
-			bIsOnLine         = true,
+			bOnline           = true,
 			bGrandpa          = false, -- 大爷
 		}
 		if tMember.bOnline ~= nil then
-			tInfo.bIsOnLine = tMember.bOnline
+			tInfo.bOnline = tMember.bOnline
 		end
 		if KPlayer then
 			-- 小吃和buff
@@ -868,7 +869,7 @@ function D.GetTeamData(page)
 		end
 		-- 秘境进度
 		if MY_TeamTools.szStatRange == 'RAID' then
-			if tInfo.bIsOnLine and bCDProgressMap then
+			if tInfo.bOnline and bCDProgressMap then
 				for i, boss in ipairs(aProgressMapBoss) do
 					tInfo.tBossKill[i] = GetDungeonRoleProgress(RT_MAP_ID, tMember.dwID, boss.dwProgressID)
 				end
@@ -897,8 +898,8 @@ function D.ApplyTeamEquip(page)
 		local team = GetClientTeam()
 		for _, tMember in ipairs(D.GetMemberList()) do
 			if tMember.dwID ~= X.GetClientPlayerID() then
-				local info = team.GetMemberInfo(tMember.dwID)
-				if info.bIsOnLine then
+				local info = X.GetTeamMemberInfo(tMember.dwID)
+				if info.bOnline then
 					D.ApplyRemotePlayerView(page, tMember.dwID, tMember.dwServerID, tMember.szGlobalID)
 				end
 			end
@@ -907,12 +908,12 @@ function D.ApplyTeamEquip(page)
 end
 
 -- 获取团队成员列表
-function D.GetMemberList(bIsOnLine)
+function D.GetMemberList(bOnline)
 	local aList = {}
 	if MY_TeamTools.szStatRange == 'RAID' then
 		for _, dwID in ipairs(X.GetTeamMemberList()) do
 			local tMember = X.GetTeamMemberInfo(dwID)
-			if tMember and (not bIsOnLine or tMember.bOnline) then
+			if tMember and (not bOnline or tMember.bOnline) then
 				table.insert(aList, {
 					dwID = tMember.dwID,
 					szGlobalID = tMember.szGlobalID,
@@ -1293,6 +1294,8 @@ local settings = {
 			preset = 'UIEvent',
 			fields = {
 				'OnInitPage',
+				'OnActivePage',
+				'OnResizePage',
 				'OnDeactivePage',
 				bStatRange = true,
 			},

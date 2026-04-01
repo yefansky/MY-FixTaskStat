@@ -1,10 +1,10 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
--- @link     : https://jx3.derzh.com/
+-- @link     : https://jx3.zhaiyiming.com/
 -- @desc     : 角色属性
 -- @author   : 茗伊 @双梦镇 @追风蹑影
--- @modifier : Emil Zhai (root@derzh.com)
--- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+-- @modifier : Emil Zhai (root@zhaiyiming.com)
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^27.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.6') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -92,7 +92,7 @@ function CharInfo.UpdateFrame(frame, status, data)
 			return { 255, 255, 255 }
 		end
 		-- 设置基础属性
-		ui:Children('#Image_Kungfu'):Icon((select(2, X.GetSkillName(data.dwMountKungfuID, 1))))
+		ui:Children('#Image_Kungfu'):Icon((select(2, X.GetSkillName(data.dwActualKungfuID or data.dwKungfuID, 1))))
 		ui:Children('#Text_Name'):Color({ X.GetForceColor(data.dwForceID) })
 		-- 绘制属性条
 		local y0 = 20
@@ -155,6 +155,10 @@ function D.ViewCharInfoToPlayer(dwID)
 	if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 		return X.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
 	end
+	local cpi = X.GetClientPlayerInfo()
+	if cpi and cpi.nLevel ~= X.CONSTANT.MAX_PLAYER_LEVEL then
+		return X.Alert(_L['Only max level can use this feature.'])
+	end
 	local nChannel, szName
 	if X.IsTeammate(dwID) then
 		local team = GetClientTeam()
@@ -181,8 +185,16 @@ function D.ViewCharInfoToPlayer(dwID)
 	if not nChannel or not szName then
 		X.Alert(_L['Party limit'])
 	else
-		CharInfo.CreateFrame(dwID, szName)
-		X.SendBgMsg(nChannel, 'CHAR_INFO', {'ASK', dwID, X.IsRestricted('MY_CharInfo.Daddy') and 'DEBUG'})
+		local bAcquaintance = X.IsTeammate(dwID) or X.IsFellowship(dwID) or X.IsAuthorPlayer(X.GetClientPlayerID(), X.GetClientPlayerName())
+		local function onAccept()
+			CharInfo.CreateFrame(dwID, szName)
+			X.SendBgMsg(nChannel, 'CHAR_INFO', {'ASK', dwID, X.IsRestricted('MY_CharInfo.Daddy') and 'DEBUG'})
+		end
+		if bAcquaintance then
+			onAccept()
+		else
+			X.Confirm(_L('[%s] will see your detailed character info request, sure to send request?', szName), onAccept)
+		end
 	end
 end
 

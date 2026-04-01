@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : Semver °æ±¾ºÅ¹¤¾ß¿â
--- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 ---@class (partial) MY
 local X = MY
@@ -10,10 +10,6 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Semver')
 --------------------------------------------------------------------------------
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
-
------------------------------------------------------------------------------------
--- https://raw.githubusercontent.com/danielmgmi/lodash.lua/master/src/lodash.lua --
------------------------------------------------------------------------------------
 
 local semver = {
   _VERSION     = '1.2.1',

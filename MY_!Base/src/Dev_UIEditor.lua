@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : UI²é¿´Æ÷
--- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 ---@class (partial) MY
 local X = MY
@@ -365,7 +365,7 @@ function D.GetTipInfo(el)
 		D.InsertTip(aXml, 'HAlign: ', el:GetHAlign())
 		D.InsertTip(aXml, 'RowSpacing: ', el:GetRowSpacing())
 		D.InsertTip(aXml, 'IsMultiLine: ', tostring(el:IsMultiLine()))
-		D.InsertTip(aXml, 'IsCenterEachLine: ', tostring(el:IsCenterEachLine()))
+		D.InsertTip(aXml, 'IsCenterEachLine: ', el.IsCenterEachLine and tostring(el:IsCenterEachLine()) or 'N/A')
 		D.InsertTip(aXml, 'FontSpacing: ', el:GetFontSpacing())
 		D.InsertTip(aXml, 'IsRichText: ', tostring(el:IsRichText()))
 		D.InsertTip(aXml, 'FontScale: ', el:GetFontScale())

@@ -1,10 +1,10 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
--- @link     : https://jx3.derzh.com/
+-- @link     : https://jx3.zhaiyiming.com/
 -- @desc     : 团队工具 - 重伤记录
 -- @author   : 茗伊 @双梦镇 @追风蹑影
--- @modifier : Emil Zhai (root@derzh.com)
--- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+-- @modifier : Emil Zhai (root@zhaiyiming.com)
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools_DeathLog'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^27.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.6') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -162,16 +162,18 @@ local function OnDeath(dwID, dwKiller)
 				INFO_CACHE[dwID] = {
 					szName = me.szName,
 					dwForceID = me.dwForceID,
-					dwMountKungfuID = UI_GetPlayerMountKungfuID(),
+					dwKungfuID = UI_GetPlayerMountKungfuID(),
+					dwActualKungfuID = UI_GetPlayerMountKungfuID(),
 				}
 			else
 				local team = GetClientTeam()
-				local info = team.GetMemberInfo(dwID)
+				local info = X.GetTeamMemberInfo(dwID)
 				if info then
 					INFO_CACHE[dwID] = {
 						szName = info.szName,
 						dwForceID = info.dwForceID,
-						dwMountKungfuID = info.dwMountKungfuID,
+						dwKungfuID = info.dwActualKungfuID,
+						dwActualKungfuID = info.dwActualKungfuID,
 					}
 				end
 			end
@@ -233,7 +235,7 @@ function D.UpdatePage(page)
 		local info = INFO_CACHE[dwID]
 		if info then
 			local h = hDeathList:AppendItemFromData(page.hDeathPlayer, 'Handle_DeathPlayer')
-			local icon = select(2, MY_GetSkillName(info.dwMountKungfuID))
+			local icon = select(2, MY_GetSkillName(info.dwActualKungfuID))
 			local szName = info.szName
 			h.dwID = dwID
 			h.szName = szName
@@ -427,6 +429,8 @@ local settings = {
 			preset = 'UIEvent',
 			fields = {
 				'OnInitPage',
+				'OnActivePage',
+				'OnResizePage',
 				'OnDeactivePage',
 			},
 			root = D,

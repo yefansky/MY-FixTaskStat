@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 插件主界面相关函数
--- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 ---@class (partial) MY
 local X = MY
@@ -441,7 +441,7 @@ function D.InitPanel(frame)
 	X.UI(frame):Size(D.OnSizeChange)
 	D.RedrawCategory(frame)
 	local fScale = 1 + math.max(Font.GetOffset() * 0.03, 0)
-	D.ResizePanel(frame, 980 * fScale, 640 * fScale)
+	D.ResizePanel(frame, 1000 * fScale, 650 * fScale)
 	frame:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 	frame:CorrectPos()
 	frame:RegisterEvent('UI_SCALED')

@@ -1,10 +1,10 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
--- @link     : https://jx3.derzh.com/
+-- @link     : https://jx3.zhaiyiming.com/
 -- @desc     : Õ½¶·Í³¼Æ Êý¾ÝÔ´
 -- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
--- @modifier : Emil Zhai (root@derzh.com)
--- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+-- @modifier : Emil Zhai (root@zhaiyiming.com)
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Recount'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^27.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.1') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -420,42 +420,42 @@ local O = X.CreateUserSettingsModule('MY_Recount', _L['Raid'], {
 
 local function CreateRingBuffer(nCapacity)
     local nActualCap = 2^math.ceil(math.log(nCapacity > 0 and nCapacity or 1, 2))
-    
+
     return {
         data = {},
         nCapacity = nActualCap,
         nStart = 1,
         nCount = 0,
-        
+
         push = function(self, value)
             local nWriteIdx = (self.nStart + self.nCount - 1) % self.nCapacity + 1
-            
+
             self.data[nWriteIdx] = value
-            
+
             if self.nCount < self.nCapacity then
                 self.nCount = self.nCount + 1
             else
                 self.nStart = (self.nStart % self.nCapacity) + 1
             end
         end,
-        
+
         forEach = function(self, callback)
-            if self.nCount <= 0 then 
-				return 
+            if self.nCount <= 0 then
+				return
 			end
-            
+
             local nCap = self.nCapacity
-            
+
             for i = 0, self.nCount - 1 do
                 local nIdx = (self.nStart + i - 1) % nCap + 1
                 callback(self.data[nIdx], i + 1)
             end
         end,
-        
+
         size = function(self)
             return self.nCount
         end,
-        
+
         clear = function(self)
             self.nStart = 1
             self.nCount = 0
@@ -637,7 +637,7 @@ function D.GetPlayer(dwID)
 	if dwID == X.GetClientPlayerID() then
 		player = X.GetClientPlayer()
 		info = {
-			dwMountKungfuID = UI_GetPlayerMountKungfuID(),
+			dwKungfuID = UI_GetPlayerMountKungfuID(),
 			szName = player.szName,
 		}
 	else
@@ -1724,9 +1724,9 @@ X.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function() -- ¿ªÕ½É¨Ãè¶ÓÓÑ ¼ÇÂ¼¿ªÕ½¾ÍËÀµ
 	local me = X.GetClientPlayer()
 	if team and me and (me.IsInParty() or me.IsInRaid()) then
 		for _, dwID in ipairs(team.GetTeamMemberList()) do
-			local info = team.GetMemberInfo(dwID)
+			local info = X.GetTeamMemberInfo(dwID)
 			if info then
-				if not info.bIsOnLine then
+				if not info.bOnline then
 					D.OnTeammateStateChange(dwID, true, AWAYTIME_TYPE.OFFLINE, true)
 				elseif info.bDeathFlag then
 					D.OnTeammateStateChange(dwID, true, AWAYTIME_TYPE.DEATH, true)

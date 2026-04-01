@@ -1,10 +1,10 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
--- @link     : https://jx3.derzh.com/
+-- @link     : https://jx3.zhaiyiming.com/
 -- @desc     : 团队面板主界面
 -- @author   : 茗伊 @双梦镇 @追风蹑影
--- @modifier : Emil Zhai (root@derzh.com)
--- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+-- @modifier : Emil Zhai (root@zhaiyiming.com)
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Cataclysm'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^27.1.23') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -165,7 +165,7 @@ local function UpdateOfficialBuff()
 		for i = 2, nCount do
 			local tLine = RaidPanelBuff:GetRow(i)
 			if (not tLine.dwMapID or tLine.dwMapID == dwMapID or tLine.dwMapID == 0)
-			and (not tLine.szMapID or X.lodash.includes(X.SplitString(tLine.szMapID, ';'), szMapID))
+			and (not tLine.szMapID or X.Contains(X.SplitString(tLine.szMapID, ';'), szMapID))
 			and (not tLine.dwMountKungfuID or tLine.dwMountKungfuID == 0 or X.IsSameKungfu(tLine.dwMountKungfuID, dwMountKungfuID)) then
 				local v = {
 					dwID = tLine.dwBuffID,
@@ -1168,6 +1168,10 @@ function D.OnLButtonClick()
 		menu.x, menu.y = nX, nY
 		PopupMenu(menu)
 	elseif szName == 'WndButton_WorldMark' then
+		if IsCtrlKeyDown() and MY_YunWorldMark then
+			MY_YunWorldMark.OpenPanel()
+			return
+		end
 		local me  = X.GetClientPlayer()
 		local dwMapID = me.GetMapID()
 		local nMapType = select(2, GetMapParams(dwMapID))

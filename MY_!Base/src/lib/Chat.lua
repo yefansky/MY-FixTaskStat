@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 聊天相关模块
--- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 ---@class (partial) MY
 local X = MY
@@ -27,7 +27,6 @@ function X.GetChatPanel(k)
 		or Station.SearchFrame('ChatPanel_Normal' .. k)
 end
 
--- 海鳗里面抠出来的
 -- 聊天复制并发布
 function X.RepeatChatLine(hTime)
 	local edit = X.GetChatInput()

@@ -1,10 +1,10 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
--- @link     : https://jx3.derzh.com/
+-- @link     : https://jx3.zhaiyiming.com/
 -- @desc     : Õ½¶·ÈÕÖ¾ Á÷Ê½±£´æÔ­Ê¼ÊÂ¼þÊý¾Ý
 -- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
--- @modifier : Emil Zhai (root@derzh.com)
--- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+-- @modifier : Emil Zhai (root@zhaiyiming.com)
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^27.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.6') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -411,24 +411,24 @@ function D.OnTargetUpdate(dwID, bForce)
 		end
 		local szName = player.szName
 		local dwForceID = player.dwForceID
-		local dwMountKungfuID = -1
+		local dwKungfuID = -1
 		if dwID == X.GetClientPlayerID() then
-			dwMountKungfuID = UI_GetPlayerMountKungfuID()
+			dwKungfuID = UI_GetPlayerMountKungfuID()
 		else
-			local info = GetClientTeam().GetMemberInfo(dwID)
-			if info and not X.IsEmpty(info.dwMountKungfuID) then
-				dwMountKungfuID = info.dwMountKungfuID
+			local info = X.GetTeamMemberInfo(dwID)
+			if info and not X.IsEmpty(info.dwActualKungfuID) then
+				dwKungfuID = info.dwActualKungfuID
 			else
 				local kungfu = player.GetKungfuMount()
 				if kungfu then
-					dwMountKungfuID = kungfu.dwSkillID
+					dwKungfuID = kungfu.dwSkillID
 				end
 			end
 		end
 		local szGUID = X.GetPlayerGlobalID(dwID) or ''
 		local aEquip, nEquipScore, aTalent, tZhenPai
 		local function OnGet()
-			D.InsertLog(LOG_TYPE.PLAYER_INFO, { dwID, szName, dwForceID, dwMountKungfuID, nEquipScore, aEquip, aTalent, szGUID, tZhenPai })
+			D.InsertLog(LOG_TYPE.PLAYER_INFO, { dwID, szName, dwForceID, dwKungfuID, nEquipScore, aEquip, aTalent, szGUID, tZhenPai })
 		end
 		X.GetPlayerEquipScore(dwID, function(nScore)
 			nEquipScore = nScore
@@ -797,10 +797,10 @@ X.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function() -- ¿ªÕ½É¨Ãè¶ÓÓÑ ¼ÇÂ¼¿ªÕ½¾ÍËÀµ
 		return
 	end
 	for _, dwID in ipairs(team.GetTeamMemberList()) do
-		local info = team.GetMemberInfo(dwID)
+		local info = X.GetTeamMemberInfo(dwID)
 		if info and D.WillRecID(dwID) then
 			D.OnTargetUpdate(dwID)
-			if not info.bIsOnLine then
+			if not info.bOnline then
 				D.InsertLog(LOG_TYPE.PARTY_SET_MEMBER_ONLINE_FLAG, { team.dwTeamID, dwID, 0 })
 			elseif info.bDeathFlag then
 				D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_DEATH_NOTIFY, { dwID, nil })

@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : ”Œœ∑ª∑æ≥ø‚
--- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 ---@class (partial) MY
 local X = MY
@@ -149,6 +149,7 @@ function X.GetTeamMemberInfo(dwID)
 				nCamp = info.nCamp,
 				dwForceID = info.dwForceID,
 				dwKungfuID = info.dwMountKungfuID,
+				dwActualKungfuID = info.dwActualMountKungfuID or info.dwMountKungfuID,
 				nMaxLife = info.nMaxLife,
 				nCurrentLife = info.nCurrentLife,
 				nMaxMana = info.nMaxMana,
@@ -178,6 +179,7 @@ function X.GetTeamMemberInfo(dwID)
 			nCamp = me.nCamp,
 			dwForceID = me.dwForceID,
 			dwKungfuID = UI_GetPlayerMountKungfuID(),
+			dwActualKungfuID = UI_GetPlayerMountKungfuID(),
 			nMaxLife = me.nMaxLife,
 			nCurrentLife = me.nCurrentLife,
 			nMaxMana = me.nMaxMana,
@@ -247,6 +249,7 @@ function X.GetRoomMemberInfo(szGlobalID)
 						nRoleType = v.nRoleType,
 						dwForceID = v.dwForceID,
 						dwKungfuID = v.dwKungfuID,
+						dwActualKungfuID = v.dwKungfuID,
 						nEquipScore = v.nEquipScore,
 						dwMiniAvatarID = v.dwMiniAvatarID,
 						nMemberIndex = v.nMemberIndex,
@@ -269,6 +272,7 @@ function X.GetRoomMemberInfo(szGlobalID)
 			nRoleType = me.nRoleType,
 			dwForceID = me.dwForceID,
 			dwKungfuID = UI_GetPlayerMountKungfuID(),
+			dwActualKungfuID = UI_GetPlayerMountKungfuID(),
 			nEquipScore = me.GetTotalEquipScore() or 0,
 			dwMiniAvatarID = me.dwMiniAvatarID,
 			nMemberIndex = 0,

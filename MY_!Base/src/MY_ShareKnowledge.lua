@@ -1,10 +1,10 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
--- @link     : https://jx3.derzh.com/
+-- @link     : https://jx3.zhaiyiming.com/
 -- @desc     : 公共数据分享模块
 -- @author   : 茗伊 @双梦镇 @追风蹑影
--- @modifier : Emil Zhai (root@derzh.com)
--- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+-- @modifier : Emil Zhai (root@zhaiyiming.com)
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
@@ -50,6 +50,9 @@ MY_RSS.RegisterAdapter('share-event', function(data)
 end)
 
 X.RegisterEvent('MY_RSS_UPDATE', function()
+	if arg0 and arg0 ~= 'share-event' then
+		return
+	end
 	for k, _ in pairs(CURRENT_EVENT) do
 		X.RegisterEvent(k, 'MY_ShareKnowledge__Event', false)
 	end
@@ -449,6 +452,9 @@ MY_RSS.RegisterAdapter('share-msg', function(data)
 end)
 
 X.RegisterEvent('MY_RSS_UPDATE', function()
+	if arg0 and arg0 ~= 'share-msg' then
+		return
+	end
 	for k, _ in pairs(CURRENT_MSG_CHANNEL) do
 		X.RegisterMsgMonitor(k, 'MY_ShareKnowledge__MSG', false)
 	end

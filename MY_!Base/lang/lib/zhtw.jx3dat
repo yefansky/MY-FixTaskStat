@@ -17,6 +17,7 @@ return {
 	['Color Picker'] = '顏色選擇器',
 	['Color Picker Pro'] = '調色板',
 	['Text Editor'] = '文本編輯器',
+	['User Input'] = '用戶輸入',
 	['Font %d'] = '字體 %d',
 
 	['Add to BOSS list'] = '加入首領列表',
@@ -215,4 +216,13 @@ return {
 
 	['Global config'] = '全局設置',
 	['Distance type'] = '默認距離計算方式',
+
+	FORMAT_RELATIVE_TIME = {
+		['just_now'] = '剛剛',
+		['seconds_ago'] = '%d秒前',
+		['minutes_ago'] = '%d分鐘前',
+		['hours_ago'] = '%d小時前',
+		['days_ago'] = '%d天前',
+		['date_format'] = '%yyyy/%MM/%dd',
+	},
 }

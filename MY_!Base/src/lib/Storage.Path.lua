@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 路径相关操作
--- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 ---@class (partial) MY
 local X = MY
@@ -80,6 +80,10 @@ function X.FormatPath(oFilePath, tParams)
 	-- if exist {$lang} then add language identity
 	if string.find(szFilePath, '{$lang}', nil, true) then
 		szFilePath = szFilePath:gsub('{%$lang}', tParams['lang'] or X.ENVIRONMENT.GAME_LANG)
+	end
+	-- if exist {$locale} then add locale identity
+	if string.find(szFilePath, '{$locale}', nil, true) then
+		szFilePath = szFilePath:gsub('{%$locale}', tParams['locale'] or X.ENVIRONMENT.GAME_LOCALE)
 	end
 	-- if exist {$edition} then add edition identity
 	if string.find(szFilePath, '{$edition}', nil, true) then

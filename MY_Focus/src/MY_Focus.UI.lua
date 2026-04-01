@@ -1,10 +1,10 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
--- @link     : https://jx3.derzh.com/
+-- @link     : https://jx3.zhaiyiming.com/
 -- @desc     : 焦点列表
 -- @author   : 茗伊 @双梦镇 @追风蹑影
--- @modifier : Emil Zhai (root@derzh.com)
--- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+-- @modifier : Emil Zhai (root@zhaiyiming.com)
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Focus'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^27.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -172,10 +172,10 @@ function D.UpdateItem(hItem, p)
 	-- 心法
 	hInfoList:Lookup('Handle_Kungfu'):Hide()
 	if dwType == TARGET.PLAYER then
-		if tMemberInfo and tMemberInfo.dwMountKungfuID then
-			hItem:Lookup('Handle_L/Handle_KungfuName/Text_Kungfu'):SetText(X.GetKungfuName(tMemberInfo.dwMountKungfuID))
+		if tMemberInfo and tMemberInfo.dwActualKungfuID then
+			hItem:Lookup('Handle_L/Handle_KungfuName/Text_Kungfu'):SetText(X.GetKungfuName(tMemberInfo.dwActualKungfuID))
 			hInfoList:Lookup('Handle_Kungfu'):Show()
-			hInfoList:Lookup('Handle_Kungfu/Image_Kungfu'):FromIconID(Table_GetSkillIconID(tMemberInfo.dwMountKungfuID, 1))
+			hInfoList:Lookup('Handle_Kungfu/Image_Kungfu'):FromIconID(Table_GetSkillIconID(tMemberInfo.dwActualKungfuID, 1))
 		else
 			local kungfu = KObject.GetKungfuMount()
 			if kungfu then
@@ -234,8 +234,8 @@ function D.UpdateItem(hItem, p)
 		hItem:Lookup('Handle_L/Handle_Compass'):Hide()
 		hItem:Lookup('Handle_L/Handle_School'):Show()
 		-- 心法图标
-		if tMemberInfo and tMemberInfo.dwMountKungfuID then
-			hItem:Lookup('Handle_L/Handle_School/Image_School'):FromIconID(Table_GetSkillIconID(tMemberInfo.dwMountKungfuID, 1))
+		if tMemberInfo and tMemberInfo.dwActualKungfuID then
+			hItem:Lookup('Handle_L/Handle_School/Image_School'):FromIconID(Table_GetSkillIconID(tMemberInfo.dwActualKungfuID, 1))
 		else
 			local kungfu = KObject.GetKungfuMount()
 			if kungfu then

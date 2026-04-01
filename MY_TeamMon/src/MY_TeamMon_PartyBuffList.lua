@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
--- @link     : https://jx3.derzh.com/
+-- @link     : https://jx3.zhaiyiming.com/
 -- @desc     : 团队重要BUFF列表
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @ref      : William Chan (Webster)
--- @modifier : Emil Zhai (root@derzh.com)
--- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+-- @modifier : Emil Zhai (root@zhaiyiming.com)
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
@@ -15,7 +15,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon_PartyBuffList'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^27.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.1') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -232,12 +232,13 @@ function D.GetPlayer(dwID)
 	if dwID == X.GetClientPlayerID() then
 		player = X.GetClientPlayer()
 		info = {
-			dwMountKungfuID = UI_GetPlayerMountKungfuID(),
+			dwKungfuID = UI_GetPlayerMountKungfuID(),
+			dwActualKungfuID = UI_GetPlayerMountKungfuID(),
 			szName = player.szName,
 		}
 	else
 		player = X.GetPlayer(dwID)
-		info = GetClientTeam().GetMemberInfo(dwID)
+		info = X.GetTeamMemberInfo(dwID)
 	end
 	if info then
 		if player then
@@ -273,14 +274,18 @@ function D.OnTableInsert(dwID, dwBuffID, nLevel, nIcon)
 			break
 		end
 	end
-	local data = { dwID = dwID, dwBuffID = dwBuffID, nLevel = nLevel }
+	local data = {
+		dwID = dwID,
+		dwBuffID = dwBuffID,
+		nLevel = nLevel,
+		szName = info.szName,
+	}
 	local h = D.handle:AppendItemFromData(D.hItem)
 	local nCount = D.handle:GetItemCount()
 	if dwTargetID == dwID then
 		h:Lookup('Image_Select'):Show()
 	end
-	h:SetUserData(nSortLFC * 1000 + dwID % 1000)
-	h:Lookup('Image_KungFu'):FromIconID(Table_GetSkillIconID(info.dwMountKungfuID) or 1435)
+	h:Lookup('Image_KungFu'):FromIconID(Table_GetSkillIconID(info.dwActualKungfuID) or 1435)
 	h:Lookup('Text_Name'):SetText(nCount .. ' ' .. info.szName)
 	h:Lookup('Image_life'):SetPercentage(info.fCurrentLife64 / math.max(info.fMaxLife64, 1))
 	local box = h:Lookup('Box_Icon')
@@ -306,7 +311,38 @@ function D.OnTableInsert(dwID, dwBuffID, nLevel, nIcon)
 	h.nLFC = nLFC
 	h.nSortLFC = nSortLFC
 	h:Show()
-	D.handle:Sort()
+	local nInsertIndex = nCount - 1
+	for i = nCount - 2, 0, -1 do
+		local item = D.handle:Lookup(i)
+		if item and item:IsValid() then
+			local nItemSortLFC = item.nSortLFC or 0
+			if nItemSortLFC < nSortLFC then
+				nInsertIndex = i + 1
+				break
+			elseif nItemSortLFC == nSortLFC then
+				local itemID = (item.data and item.data.dwID) or 0
+				if itemID <= dwID then
+					nInsertIndex = i + 1
+					break
+				else
+					nInsertIndex = i
+				end
+			else
+				nInsertIndex = i
+			end
+		end
+	end
+	h:SetIndex(nInsertIndex)
+	for i = nInsertIndex, nCount - 1 do
+		local item = D.handle:Lookup(i)
+		if item and item:IsValid() then
+			local text = item:Lookup('Text_Name')
+			if text and text:IsValid() then
+				local szName = (item.data and item.data.szName) or ''
+				text:SetText((i + 1) .. ' ' .. szName)
+			end
+		end
+	end
 	D.handle:FormatAllItemPos()
 	D.SwitchPanel(nCount)
 	CACHE_LIST[key] = h

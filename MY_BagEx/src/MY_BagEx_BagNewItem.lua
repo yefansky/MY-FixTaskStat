@@ -1,10 +1,10 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
--- @link     : https://jx3.derzh.com/
+-- @link     : https://jx3.zhaiyiming.com/
 -- @desc     : 背包新物品
 -- @author   : 茗伊 @双梦镇 @追风蹑影
--- @modifier : Emil Zhai (root@derzh.com)
--- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+-- @modifier : Emil Zhai (root@zhaiyiming.com)
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_BagEx_BagNewItem'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^27.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.7') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -95,6 +95,19 @@ function D.CreateBagItemCache()
 end
 
 function D.OnBagItemUpdate(dwBox, dwX)
+	-- Only process items in regular package boxes, skip special packages (e.g., NEARLY_DYING_PACKAGE)
+	local aPackageBoxList = X.GetInventoryBoxList(X.CONSTANT.INVENTORY_TYPE.PACKAGE)
+	local bInPackage = false
+	for _, dwIterBox in ipairs(aPackageBoxList) do
+		if dwIterBox == dwBox then
+			bInPackage = true
+			break
+		end
+	end
+	if not bInPackage then
+		D.CreateBagItemCache() -- still refresh cache to keep it in sync
+		return
+	end
 	local me = X.GetClientPlayer()
 	local kItem = X.GetInventoryItem(me, dwBox, dwX)
 	if kItem then
@@ -129,7 +142,7 @@ function D.OnBagItemUpdate(dwBox, dwX)
 					end
 				end
 			end
-			if dwExcBox and dwExcX and dwExcBox ~= dwBox or dwExcX ~= dwX then
+			if dwExcBox and dwExcX and (dwExcBox ~= dwBox or dwExcX ~= dwX) then
 				EXCHANGE_BOX_TIME[dwExcBox .. ',' .. dwExcX] = GetCurrentTime() + 1 -- 保证一秒内不同时交换两个物品到同一个格子导致失败
 				NEW_ITEM_FLAG_TIME[kItem.dwID] = GetCurrentTime() + 5 -- 五秒内始终认为该物品为新物品
 				--[[#DEBUG BEGIN]]

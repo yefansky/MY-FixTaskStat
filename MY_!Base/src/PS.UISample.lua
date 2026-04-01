@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 界面组件库示例
--- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 ---@class (partial) MY
 local X = MY
@@ -275,6 +275,15 @@ local COMPONENT_SAMPLE = {
 					sorter = true,
 					tip = function(value, record, index)
 						return GetFormatText(value, 162, 255, 255, 0), true
+					end,
+				},
+				{
+					key = 'overflow',
+					title = 'Overflow',
+					width = 30,
+					overflow = 'hidden',
+					render = function()
+						return GetFormatText('OVERFLOW OVERFLOW OVERFLOW OVERFLOW OVERFLOW OVERFLOW OVERFLOW OVERFLOW OVERFLOW OVERFLOW OVERFLOW OVERFLOW', 162, 255, 255, 0)
 					end,
 				},
 				{

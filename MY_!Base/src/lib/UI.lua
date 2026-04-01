@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 界面库
--- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 ---@class (partial) MY
 local X = MY
@@ -188,7 +188,7 @@ X.UI.FRAME_THEME = X.FreezeTable({
 	EMPTY  = 'empty' , -- 空白窗体
 })
 X.UI.LAYER_LIST = {'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2'}
-X.UI.IS_GLASSMORPHISM = IsFileExist('ui\\Image\\denglu\\Sign_BdCommon.UITex')
+X.UI.IS_GLASSMORPHISM = IsFileExist('ui\\Image\\denglu\\Sign_BdCommon.UITex') and not X.IS_CLASSIC
 
 local BUTTON_STYLE_CONFIG = {
 	DEFAULT = {
@@ -1273,29 +1273,76 @@ local function InitComponent(raw, szType)
 			if not nScrollX or nScrollX == 'auto' then
 				nScrollX = raw:GetW() - nFixedLWidth - nFixedRWidth
 			end
-			local nExtraWidth, nStaticWidth = nScrollX, 0
+			-- 计算各列最终宽度
+			local aColWidth = {}
+			local nTotalBaseWidth = 0
+			local aFlexibleCols = {} -- 弹性列（没有设置width字段的列）
 			for i, col in ipairs(aScrollableColumns) do
-				if col.minWidth then
-					nExtraWidth = nExtraWidth - col.minWidth
-				elseif col.width then
-					nExtraWidth = nExtraWidth - col.width
-					nStaticWidth = nStaticWidth + col.width
+				local nBaseWidth = col.width or col.minWidth or 0
+				aColWidth[i] = nBaseWidth
+				nTotalBaseWidth = nTotalBaseWidth + nBaseWidth
+				if not col.width then
+					table.insert(aFlexibleCols, i)
 				end
 			end
-			if nExtraWidth < 0 then
-				nScrollX = nScrollX - nExtraWidth
-				nExtraWidth = 0
+			-- 计算剩余宽度
+			local nExtraWidth = nScrollX - nTotalBaseWidth
+			if nExtraWidth > 0 then
+				-- 第一步：如果存在非固定宽度列，优先将剩余宽度平均分配给它们
+				if #aFlexibleCols > 0 then
+					local nAvgExtra = nExtraWidth / #aFlexibleCols
+					for _, i in ipairs(aFlexibleCols) do
+						aColWidth[i] = aColWidth[i] + nAvgExtra
+					end
+					nExtraWidth = 0 -- 剩余宽度已分配完
+				end
+				-- 第二步：收集所有未达到maxWidth的列，检查并处理超出maxWidth的情况
+				local aUnmaxedCols = {}
+				local nOverflow = 0
+				for i, col in ipairs(aScrollableColumns) do
+					if col.maxWidth and aColWidth[i] > col.maxWidth then
+						nOverflow = nOverflow + (aColWidth[i] - col.maxWidth)
+						aColWidth[i] = col.maxWidth
+					else
+						table.insert(aUnmaxedCols, i)
+					end
+				end
+				-- 加上情况一中未分配的剩余宽度
+				nOverflow = nOverflow + nExtraWidth
+				-- 第三步：循环将超出部分按原始width比例分配给未达到maxWidth的列
+				while nOverflow > 0.01 and #aUnmaxedCols > 0 do
+					local nTotalOrigWidth = 0
+					for _, i in ipairs(aUnmaxedCols) do
+						nTotalOrigWidth = nTotalOrigWidth + (aScrollableColumns[i].minWidth or aScrollableColumns[i].width or 0)
+					end
+					if nTotalOrigWidth <= 0 then
+						break
+					end
+					local aNextUnmaxedCols = {}
+					local nNextOverflow = 0
+					for _, i in ipairs(aUnmaxedCols) do
+						local col = aScrollableColumns[i]
+						local nOrigWidth = col.minWidth or col.width or 0
+						local nAddWidth = nOverflow * nOrigWidth / nTotalOrigWidth
+						aColWidth[i] = aColWidth[i] + nAddWidth
+						if col.maxWidth and aColWidth[i] > col.maxWidth then
+							nNextOverflow = nNextOverflow + (aColWidth[i] - col.maxWidth)
+							aColWidth[i] = col.maxWidth
+						else
+							table.insert(aNextUnmaxedCols, i)
+						end
+					end
+					nOverflow = nNextOverflow
+					aUnmaxedCols = aNextUnmaxedCols
+				end
+			elseif nExtraWidth < 0 then
+				-- 宽度不足，使用原始宽度，出现滚动条
+				nScrollX = nTotalBaseWidth
 			end
+			-- 应用计算后的宽度
 			for i, col in ipairs(aScrollableColumns) do
 				local hCol = hScrollableColumns:Lookup(i - 1) -- 外部居中层
-				local nMinWidth = col.minWidth
-				local nWidth = i == #aScrollableColumns
-					and (nScrollX - nX)
-					or (
-						nMinWidth
-							and math.min(nExtraWidth * nMinWidth / (nScrollX - nExtraWidth) + nMinWidth, col.maxWidth or math.huge)
-							or (col.width or 0)
-					)
+				local nWidth = aColWidth[i] or col.width or col.minWidth or 0
 				if i == 1 then
 					hCol:Lookup('Image_TableColumn_Break'):Hide()
 				end
@@ -1587,8 +1634,9 @@ local function InitComponent(raw, szType)
 					hRow:Lookup('Image_RowBg'):SetVisible(nRowIndex % 2 == 1)
 					for nColumnIndex, col in ipairs(aColumns) do
 						local xValue = rec[col.key]
-						local hItem = hRowColumns:AppendItemFromIni(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndTable.ini', 'Handle_Item') -- 外部居中层
-						local hItemContent = hItem:Lookup('Handle_ItemContent') -- 内部文本布局层
+						local hItem = hRowColumns:AppendItemFromIni(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndTable.ini', col.overflow == 'hidden' and 'Handle_Item_PixelScroll' or 'Handle_Item') -- 外部居中层
+						hItem:SetName('Handle_Item')
+						local hItemContent = hItem:AppendItemFromIni(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndTable.ini', 'Handle_ItemContent') -- 内部文本布局层
 						local szXml
 						if col.render then
 							szXml = col.render(xValue, rec, nRowIndex)
@@ -1818,8 +1866,9 @@ local function InitComponent(raw, szType)
 				local hRowColumns = hRow:Lookup('Handle_RowColumns')
 				hRowColumns:Clear()
 				for nColumnIndex, col in ipairs(aColumns) do
-					local hItem = hRowColumns:AppendItemFromIni(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndTable.ini', 'Handle_Item') -- 外部居中层
-					local hItemContent = hItem:Lookup('Handle_ItemContent') -- 内部文本布局层
+					local hItem = hRowColumns:AppendItemFromIni(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndTable.ini', col.overflow == 'hidden' and 'Handle_Item_PixelScroll' or 'Handle_Item') -- 外部居中层
+					hItem:SetName('Handle_Item')
+					local hItemContent = hItem:AppendItemFromIni(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndTable.ini', 'Handle_ItemContent') -- 内部文本布局层
 					local szXml
 					if X.IsTable(rec) then
 						if col.render then
@@ -2831,42 +2880,58 @@ local function SetComponentEnable(raw, bEnable)
 	if bEnabled == bEnable then
 		return
 	end
-	-- make gray
-	local txt = GetComponentElement(raw, 'TEXT')
-	if txt then
-		local r, g, b = txt:GetFontColor()
-		local ratio = bEnable and 2.2 or (1 / 2.2)
-		if math.max(r, g, b) * ratio > 255 then
-			ratio = 255 / math.max(r, g, b)
+	-- WndTable: set gray filter on header and content
+	if GetComponentType(raw) == 'WndTable' then
+		local hTotal = raw:Lookup('', '')
+		if hTotal then
+			hTotal:SetAlpha(bEnable and 255 or 128)
 		end
-		txt:SetFontColor(math.ceil(r * ratio), math.ceil(g * ratio), math.ceil(b * ratio))
-	end
-	-- make gray
-	local sha = GetComponentElement(raw, 'SHADOW')
-	if sha then
-		local r, g, b = sha:GetColorRGB()
-		local ratio = bEnable and 2.2 or (1 / 2.2)
-		if math.max(r, g, b) * ratio > 255 then
-			ratio = 255 / math.max(r, g, b)
+		local scrollX = raw:Lookup('Scroll_X')
+		if scrollX then
+			scrollX:Enable(bEnable)
 		end
-		sha:SetColorRGB(math.ceil(r * ratio), math.ceil(g * ratio), math.ceil(b * ratio))
-	end
-	-- set sub elements enable
-	local combo = GetComponentElement(raw, 'COMBO_BOX')
-	if combo then
-		combo:Enable(bEnable)
-	end
-	local slider = GetComponentElement(raw, 'SLIDER')
-	if slider then
-		slider:Enable(bEnable)
-	end
-	local edit = GetComponentElement(raw, 'EDIT')
-	if edit then
-		edit:Enable(bEnable)
-	end
-	-- set enable
-	if raw.Enable then
-		raw:Enable(bEnable)
+		local scrollY = raw:Lookup('Scroll_Y')
+		if scrollY then
+			scrollY:Enable(bEnable)
+		end
+	else
+		-- make gray
+		local txt = GetComponentElement(raw, 'TEXT')
+		if txt then
+			local r, g, b = txt:GetFontColor()
+			local ratio = bEnable and 2.2 or (1 / 2.2)
+			if math.max(r, g, b) * ratio > 255 then
+				ratio = 255 / math.max(r, g, b)
+			end
+			txt:SetFontColor(math.ceil(r * ratio), math.ceil(g * ratio), math.ceil(b * ratio))
+		end
+		-- make gray
+		local sha = GetComponentElement(raw, 'SHADOW')
+		if sha then
+			local r, g, b = sha:GetColorRGB()
+			local ratio = bEnable and 2.2 or (1 / 2.2)
+			if math.max(r, g, b) * ratio > 255 then
+				ratio = 255 / math.max(r, g, b)
+			end
+			sha:SetColorRGB(math.ceil(r * ratio), math.ceil(g * ratio), math.ceil(b * ratio))
+		end
+		-- set sub elements enable
+		local combo = GetComponentElement(raw, 'COMBO_BOX')
+		if combo then
+			combo:Enable(bEnable)
+		end
+		local slider = GetComponentElement(raw, 'SLIDER')
+		if slider then
+			slider:Enable(bEnable)
+		end
+		local edit = GetComponentElement(raw, 'EDIT')
+		if edit then
+			edit:Enable(bEnable)
+		end
+		-- set enable
+		if raw.Enable then
+			raw:Enable(bEnable)
+		end
 	end
 	SetComponentProp(raw, 'bEnable', bEnable)
 end
@@ -5923,6 +5988,7 @@ function OO:Align(alignHorizontal, alignVertical)
 	if alignVertical or alignHorizontal then
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'TEXT')
+				or GetComponentElement(raw, 'EDIT')
 				or GetComponentElement(raw, 'MAIN_HANDLE')
 			if raw then
 				if alignHorizontal and raw.SetHAlign then
@@ -6075,7 +6141,8 @@ end
 function OO:BringToTop()
 	self:_checksum()
 	for _, raw in ipairs(self.raws) do
-		raw = GetComponentElement(raw, 'MAIN_WINDOW')
+		raw = GetComponentElement(raw, 'WND')
+			or GetComponentElement(raw, 'MAIN_WINDOW')
 		if raw then
 			raw:BringToTop()
 		end
@@ -6087,7 +6154,8 @@ end
 function OO:BringToBottom()
 	self:_checksum()
 	for _, raw in ipairs(self.raws) do
-		raw = GetComponentElement(raw, 'MAIN_WINDOW')
+		raw = GetComponentElement(raw, 'WND')
+			or GetComponentElement(raw, 'MAIN_WINDOW')
 		if raw then
 			local parent = raw:GetParent()
 			if parent then

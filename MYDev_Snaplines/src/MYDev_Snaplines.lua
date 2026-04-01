@@ -1,10 +1,10 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
--- @link     : https://jx3.derzh.com/
+-- @link     : https://jx3.zhaiyiming.com/
 -- @desc     : 开发者工具
 -- @author   : 茗伊 @双梦镇 @追风蹑影
--- @modifier : Emil Zhai (root@derzh.com)
--- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+-- @modifier : Emil Zhai (root@zhaiyiming.com)
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MYDev_Snaplines'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^27.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -231,7 +231,7 @@ local function InsertElementDetailTip(hElem, tTip)
 		table.insert(tTip, _L('HAlign: %s', hElem:GetHAlign()))
 		table.insert(tTip, _L('RowSpacing: %s', hElem:GetRowSpacing()))
 		table.insert(tTip, _L('IsMultiLine: %s', tostring(hElem:IsMultiLine())))
-		table.insert(tTip, _L('IsCenterEachLine: %s', tostring(hElem:IsCenterEachLine())))
+		table.insert(tTip, _L('IsCenterEachLine: %s', tostring(hElem.IsCenterEachLine and tostring(hElem:IsCenterEachLine()) or 'N/A')))
 		table.insert(tTip, _L('FontSpacing: %s', hElem:GetFontSpacing()))
 		table.insert(tTip, _L('IsRichText: %s', tostring(hElem:IsRichText())))
 		table.insert(tTip, _L('FontScale: %s', hElem:GetFontScale()))

@@ -1,10 +1,10 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
--- @link     : https://jx3.derzh.com/
+-- @link     : https://jx3.zhaiyiming.com/
 -- @desc     : 目标监控配置相关
 -- @author   : 茗伊 @双梦镇 @追风蹑影
--- @modifier : Emil Zhai (root@derzh.com)
--- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+-- @modifier : Emil Zhai (root@zhaiyiming.com)
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
@@ -15,7 +15,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TargetMon'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^27.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -71,6 +71,8 @@ local MY_TARGET_MON_MAP_TYPE = {
 	COMPETITION     = -17, -- 竞技
 	GUILD_TERRITORY = -18, -- 帮会领地
 	CAMP            = -19, -- 阵营地图
+	STRONGHOLD      = -20, -- 据点地图
+	SCHOOL          = -21, -- 门派地图
 	RECYCLE_BIN     =  -9, -- 回收站
 }
 local MY_TARGET_MON_MAP_TYPE_NAME = {
@@ -92,6 +94,8 @@ local MY_TARGET_MON_MAP_TYPE_NAME = {
 	[MY_TARGET_MON_MAP_TYPE.ROGUELIKE      ] = _L['Roguelike map'],
 	[MY_TARGET_MON_MAP_TYPE.COMPETITION    ] = _L['Competition map'],
 	[MY_TARGET_MON_MAP_TYPE.CAMP           ] = _L['Camp map'],
+	[MY_TARGET_MON_MAP_TYPE.STRONGHOLD     ] = _L['Stronghold map'],
+	[MY_TARGET_MON_MAP_TYPE.SCHOOL         ] = _L['School map'],
 	[MY_TARGET_MON_MAP_TYPE.RECYCLE_BIN    ] = _L['Recycle bin map'],
 }
 

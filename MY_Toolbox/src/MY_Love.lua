@@ -1,10 +1,10 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
--- @link     : https://jx3.derzh.com/
+-- @link     : https://jx3.zhaiyiming.com/
 -- @desc     : ½£ÏÀÇéÔµ
 -- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
--- @modifier : Emil Zhai (root@derzh.com)
--- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+-- @modifier : Emil Zhai (root@zhaiyiming.com)
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Love'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^27.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.5') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -932,8 +932,8 @@ function D.RequestBackupLover()
 	local lover = X.Clone(D.lover)
 	if lover.nLoverType == 1 then -- Ë«Ïò
 		local kTarget = D.GetNearbyPlayerByXID(lover.xID)
-		local info = kTarget and GetClientTeam().GetMemberInfo(kTarget.dwID)
-		if not info or not info.bIsOnLine then
+		local info = kTarget and X.GetTeamMemberInfo(kTarget.dwID)
+		if not info or not info.bOnline then
 			X.OutputSystemAnnounceMessage(_L['Lover must in your team and online to do backup.'])
 		else
 			X.SendBgMsg(lover.szName, 'MY_LOVE', {'BACKUP'})

@@ -1,10 +1,10 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
--- @link     : https://jx3.derzh.com/
+-- @link     : https://jx3.zhaiyiming.com/
 -- @desc     : 简易的多人拍卖
 -- @author   : 茗伊 @双梦镇 @追风蹑影
--- @modifier : Emil Zhai (root@derzh.com)
--- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+-- @modifier : Emil Zhai (root@zhaiyiming.com)
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
@@ -787,7 +787,7 @@ X.RegisterBgMsg('MY_BIDDING_ACTION', function(_, data, nChannel, dwTalkerID, szT
 		nPrice = data.nPrice,
 		dwTime = GetCurrentTime(),
 		dwTick = GetTickCount(),
-		dwKungfu = GetClientTeam().GetMemberInfo(dwTalkerID).dwMountKungfuID,
+		dwKungfu = X.GetTeamMemberInfo(dwTalkerID).dwKungfuID,
 	})
 	local frame = D.GetFrame(data.szKey)
 	if not frame then

@@ -1,10 +1,10 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
--- @link     : https://jx3.derzh.com/
+-- @link     : https://jx3.zhaiyiming.com/
 -- @desc     : 分享首次击杀
 -- @author   : 茗伊 @双梦镇 @追风蹑影
--- @modifier : Emil Zhai (root@derzh.com)
--- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+-- @modifier : Emil Zhai (root@zhaiyiming.com)
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/jx3box/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^27.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.6') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -209,9 +209,10 @@ function D.UpdateMapBossAchieveAcquire()
 	BOSS_ACHIEVE_ACQUIRE_STATE = tBossAchieveAcquireState
 end
 X.RegisterEvent('MY_RSS_UPDATE', 'MY_JBAchievementRank', function()
-	if not arg0 or arg0 == 'achievement-rank' then
-		D.UpdateMapBossAchieveAcquire()
+	if arg0 and arg0 ~= 'achievement-rank' then
+		return
 	end
+	D.UpdateMapBossAchieveAcquire()
 end)
 X.RegisterEvent('LOADING_ENDING', 'MY_JBAchievementRank', D.UpdateMapBossAchieveAcquire)
 
@@ -235,10 +236,10 @@ X.RegisterEvent({
 				end
 				-- 团员
 				for _, dwTarID in ipairs(team.GetTeamMemberList()) do
-					local info = team.GetMemberInfo(dwTarID)
+					local info = X.GetTeamMemberInfo(dwTarID)
 					local guid = X.GetPlayerGlobalID(dwTarID) or 0
 					if info then
-						table.insert(aTeammate, info.szName .. ',' .. info.dwMountKungfuID .. ',' .. guid .. ',' .. dwTarID)
+						table.insert(aTeammate, info.szName .. ',' .. info.dwActualKungfuID .. ',' .. guid .. ',' .. dwTarID)
 					end
 				end
 			else
