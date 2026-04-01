@@ -190,6 +190,7 @@ function D.CheckConflict(bRestore)
 		}) do
 			local el = Station.Lookup(szPath)
 			if el then
+				el.bMY_BagEx_ConflictHidden = true
 				el:Hide()
 			end
 		end
@@ -207,6 +208,7 @@ function D.CheckConflict(bRestore)
 		}) do
 			local el = Station.Lookup(szPath)
 			if el then
+				el.bMY_BagEx_ConflictHidden = nil
 				el:Show()
 			end
 		end
