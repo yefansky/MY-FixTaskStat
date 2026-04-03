@@ -229,7 +229,7 @@ function D.UpdateList(page)
 
 	for k, v in ipairs(aTeam) do
 		-- 心法统计
-		local dwHDKungfuID = GetHDKungfuID(v.dwKungfuID)
+		local dwHDKungfuID = X.GetHDKungfuID(v.dwKungfuID)
 		tKungfu[dwHDKungfuID] = tKungfu[dwHDKungfuID] or {}
 		table.insert(tKungfu[dwHDKungfuID], v)
 		D.CountScore(v, tScore)
