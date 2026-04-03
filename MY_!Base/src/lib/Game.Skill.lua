@@ -535,4 +535,14 @@ function X.IsClientPlayerMountMobileKungfu()
 	return IsMobileKungfu and IsMobileKungfu() or false
 end
 
+---获取心法对应的心法ID，非HD版本直接返回原始心法ID
+---@param dwKungfuID number @心法ID
+---@return number @心法ID
+function X.GetHDKungfuID(dwKungfuID)
+	if GetHDKungfuID then
+		return GetHDKungfuID(dwKungfuID)
+	end
+	return dwKungfuID
+end
+
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
