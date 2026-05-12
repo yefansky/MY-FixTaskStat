@@ -430,7 +430,6 @@ function X.Ajax(settings)
 			szKey = szKey + 1
 		end
 		szKey = AJAX_TAG .. szKey
-		local szRequestKey = '__addon_' .. szKey
 		local ssl = xurl:sub(1, 6) == 'https:'
 		if method == 'post' then
 			local data = xdata
@@ -442,9 +441,9 @@ function X.Ajax(settings)
 					data[X.DecodeURIComponent(k)] = X.DecodeURIComponent(v)
 				end
 			end
-			CURL_HttpPost(szRequestKey, xurl, data or '', ssl, config.timeout)
+			CURL_HttpPost(szKey, xurl, data or '', ssl, config.timeout)
 		else
-			CURL_HttpRqst(szRequestKey, xurl, ssl, config.timeout)
+			CURL_HttpRqst(szKey, xurl, ssl, config.timeout)
 		end
 		local info = {
 			settings = settings,
@@ -511,8 +510,7 @@ function X.DownloadFile(szURL, szPath)
 			if CURL_DownloadFile then
 				info.resolve = resolve
 				info.reject = reject
-				local szDownloadKey = '__addon_' .. szKey
-				CURL_DownloadFile(szDownloadKey, szURL, szPath, szURL:lower():find('^https://') and true or false, 5)
+				CURL_DownloadFile(szKey, szURL, szPath, szURL:lower():find('^https://') and true or false, 5)
 			else
 				for _, k in ipairs(info.keys) do
 					PENDING[k] = nil
