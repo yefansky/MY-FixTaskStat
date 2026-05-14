@@ -29,8 +29,6 @@ local RRWP_FREE = {}
 local RRWC_FREE = {}
 local CALL_AJAX = {}
 local AJAX_TAG = X.NSFormatString('{$NS}_AJAX#')
-local AJAX_BRIDGE_WAIT = 10000
-local AJAX_BRIDGE_PATH = X.PACKET_INFO.DATA_ROOT .. '#cache/curl/'
 
 local function CreateWebPageFrame()
 	local szRequestID, hFrame
@@ -226,8 +224,6 @@ function X.Ajax(settings)
 		X.DEBUG_LEVEL.LOG
 	)
 	--[[#DEBUG END]]
-	local bridgewait = GetTime() + AJAX_BRIDGE_WAIT
-	local bridgewaitkey = X.NSFormatString('{$NS}_AJAX_') .. id
 	local fulfilled = false
 	settings.callback = function(html, status)
 		if fulfilled then
@@ -262,42 +258,13 @@ function X.Ajax(settings)
 			else
 				X.SafeCallWithThis(settings.config, onerror, html, status)
 			end
-			X.XpCall(settings.closebridge)
 		end
-		if connected then
-			resolve()
-		else
-			X.DelayCall(bridgewaitkey, bridgewait - GetTime(), resolve)
-		end
+		resolve()
 	end
 
 	-------------------------------
 	-- each driver handlers
 	-------------------------------
-	-- bridge
-	local bridgekey = X.NSFormatString('{$NS}RRDF_TO_') .. id
-	local bridgein = AJAX_BRIDGE_PATH .. id .. '.' .. X.ENVIRONMENT.GAME_LANG .. '.jx3dat'
-	local bridgeout = AJAX_BRIDGE_PATH .. id .. '.result.' .. X.ENVIRONMENT.GAME_LANG .. '.jx3dat'
-	local bridgetimeout = GetTime() + config.timeout
-	settings.closebridge = function()
-		CPath.DelFile(bridgein)
-		CPath.DelFile(bridgeout)
-		X.DelayCall(bridgewaitkey, false)
-		X.BreatheCall(bridgekey, false)
-		X.DelayCall(bridgekey, false)
-		X.RegisterExit(bridgekey, false)
-	end
-	X.SaveLUAData(bridgein, config, { encoder = 'luatext', passphrase = false })
-	X.BreatheCall(bridgekey, 200, function()
-		local data = X.LoadLUAData(bridgeout, { passphrase = false })
-		if X.IsTable(data) then
-			settings.callback(data.content, data.status)
-		elseif GetTime() > bridgetimeout then
-			settings.callback()
-		end
-	end)
-	X.DelayCall(bridgekey, config.timeout, settings.closebridge)
-	X.RegisterExit(bridgekey, settings.closebridge)
 
 	local canajax, errmsg = X.CanAjax(driver, method)
 	if not canajax then
@@ -636,7 +603,7 @@ end
 function X.EnsureAjax(options)
 	local key = GetStringCRC(X.EncodeLUAData({options.url, options.data}))
 	local configs, i, dc = {{'curl', 'post'}, {'origin', 'post'}, {'origin', 'get'}, {'webcef', 'get'}}, 1, nil
-	-- 移除无法访问的调用方式，但至少保留一个用于尝试桥接通信
+	-- 移除无法访问的调用方式，但至少保留一种驱动用于依次重试
 	for i, config in X.ipairs_r(configs) do
 		if i >= 1 and not X.CanAjax(config[1], config[2]) then
 			table.remove(configs, i)
