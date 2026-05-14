@@ -148,10 +148,7 @@ def __get_current_version(packet: Optional[str] = None) -> str:
 
     base_file: str = f"{packet}_!Base/src/lib/Base.lua"
     try:
-        # 用 latin-1 解码（永不失败、对 ASCII 透明），版本号本身是纯 ASCII，
-        # 无需正确解码中文，即可避免 CI 上 GBK/UTF-8 解码失败的问题。
-        with open(base_file, "rb") as f:
-            content = f.read().decode("latin-1")
+        content = utils.read_file(base_file)
         for line in content.splitlines():
             if line.startswith("local _VERSION_ "):
                 # 去掉前缀并移除引号
