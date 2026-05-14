@@ -667,7 +667,10 @@ def run(
         version_info: Dict[str, str] = {"current": "", "current_hash": ""}
         base_file: str = f"{packet}_!Base/src/lib/Base.lua"
         try:
-            content = utils.read_file(base_file)
+            # 用 latin-1 解码（永不失败、对 ASCII 透明），版本号是纯 ASCII，
+            # 避免 CI 上 GBK/UTF-8 解码失败的问题。
+            with open(base_file, "rb") as f:
+                content = f.read().decode("latin-1")
             for line in content.splitlines():
                 if line.startswith("local _VERSION_ "):
                     import re
